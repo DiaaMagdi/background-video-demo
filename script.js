@@ -1,14 +1,22 @@
 (function () {
   var video = document.getElementById("scrubVideo");
+  var source = video.querySelector("source");
   var shell = document.querySelector(".video-shell");
   var progressBar = document.getElementById("progressBar");
   var notice = document.getElementById("videoNotice");
+  var assetSrc = source ? source.getAttribute("src") : "";
   var debugEnabled = new URLSearchParams(window.location.search).has("debugVideo");
   var debugPanel = null;
+  var objectUrl = null;
+  var sourceMode = "native";
   var duration = 0;
+  var targetTime = 0;
   var ticking = false;
   var lastEvent = "init";
   var syncUntil = 0;
+  var settleThreshold = 0.025;
+  var snapThreshold = 0.08;
+  var scrubEase = 0.22;
 
   if (debugEnabled) {
     debugPanel = document.createElement("pre");
@@ -44,7 +52,10 @@
       duration: video.duration,
       trackedDuration: duration,
       currentTime: video.currentTime,
+      targetTime: targetTime,
       currentSrc: video.currentSrc,
+      assetSrc: assetSrc,
+      sourceMode: sourceMode,
       error: video.error ? video.error.code : null,
       videoClass: video.className,
       shellClass: shell ? shell.className : null,
@@ -96,18 +107,38 @@
 
     // Scroll progress is mapped directly to the video's timeline.
     // Top of the page is 0s; bottom of the page is the full duration.
-    var targetTime = progress * duration;
+    targetTime = progress * duration;
 
-    if (Math.abs(video.currentTime - targetTime) > 0.035) {
+    var timeDelta = targetTime - video.currentTime;
+    var absDelta = Math.abs(timeDelta);
+
+    if (video.seeking) {
+      queueScrubFrame();
+      return;
+    }
+
+    if (absDelta > settleThreshold) {
+      var nextTime =
+        absDelta <= snapThreshold
+          ? targetTime
+          : video.currentTime + timeDelta * scrubEase;
+
+      video.currentTime = clamp(nextTime, 0, duration);
+    }
+
+    if (Math.abs(targetTime - video.currentTime) > settleThreshold) {
+      queueScrubFrame();
+      return;
+    }
+
+    if (performance.now() > syncUntil && Math.abs(video.currentTime - targetTime) > 0) {
       video.currentTime = targetTime;
     }
 
     keepScrubSynced();
   }
 
-  function requestScrub() {
-    syncUntil = performance.now() + 250;
-
+  function queueScrubFrame() {
     if (ticking) {
       return;
     }
@@ -116,15 +147,59 @@
     window.requestAnimationFrame(scrubVideo);
   }
 
+  function requestScrub() {
+    syncUntil = performance.now() + 250;
+    queueScrubFrame();
+  }
+
   function requestFinalScrub() {
     syncUntil = performance.now() + 700;
-    requestScrub();
+    queueScrubFrame();
   }
 
   function keepScrubSynced() {
     if (performance.now() <= syncUntil) {
-      requestScrub();
+      queueScrubFrame();
     }
+  }
+
+  function loadNativeVideo() {
+    sourceMode = "native";
+    video.load();
+    updateDebug("native-source");
+  }
+
+  function loadVideoAsset() {
+    if (!assetSrc || !window.fetch || !window.URL || !window.Blob) {
+      loadNativeVideo();
+      return;
+    }
+
+    sourceMode = "loading-blob";
+    updateDebug("loading-blob");
+
+    fetch(assetSrc)
+      .then(function (response) {
+        if (!response.ok) {
+          throw new Error("Video request failed with status " + response.status);
+        }
+
+        return response.blob();
+      })
+      .then(function (blob) {
+        if (objectUrl) {
+          window.URL.revokeObjectURL(objectUrl);
+        }
+
+        objectUrl = window.URL.createObjectURL(blob);
+        sourceMode = "blob";
+        video.src = objectUrl;
+        video.load();
+        updateDebug("blob-source");
+      })
+      .catch(function () {
+        loadNativeVideo();
+      });
   }
 
   ["loadstart", "loadedmetadata", "durationchange", "loadeddata", "canplay"].forEach(
@@ -155,7 +230,7 @@
   window.addEventListener("scrollend", requestFinalScrub);
   window.addEventListener("resize", requestScrub);
 
-  video.load();
+  loadVideoAsset();
 
   if (video.readyState >= 1) {
     markVideoReady("initial-readyState");
