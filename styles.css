@@ -23,7 +23,7 @@ body {
   min-height: 100%;
   margin: 0;
   overflow-x: hidden;
-  background: var(--background-dark);
+  background: transparent;
 }
 
 .video-shell,
@@ -35,7 +35,7 @@ body {
 }
 
 .video-shell {
-  z-index: -2;
+  z-index: 0;
   background:
     radial-gradient(circle at 18% 18%, rgba(80, 103, 235, 0.42), transparent 34%),
     linear-gradient(135deg, #020617 0%, #0f172a 48%, #07111f 100%);
