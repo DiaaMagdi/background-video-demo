@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Montfort Scroll Video Demo</title>
+    <meta
+      name="description"
+      content="A scroll-scrubbed cinematic video demo controlled by page progress."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css?v=20260507-1345" />
+  </head>
+  <body>
+    <div class="video-shell" aria-hidden="true">
+      <video
+        id="scrubVideo"
+        class="background-video"
+        muted
+        playsinline
+        preload="auto"
+      >
+        <source src="./montfort-scroll-demo.mp4?v=20260507-1345" type="video/mp4" />
+      </video>
+      <div class="fallback-frame"></div>
+      <div class="shade"></div>
+    </div>
+
+    <div class="progress" aria-hidden="true">
+      <span id="progressBar"></span>
+    </div>
+
+    <main class="story">
+      <section class="panel panel-start">
+        <article class="glass-card">
+          <p class="eyebrow">Montfort-style demo</p>
+          <h1>Cinematic background</h1>
+          <p>
+            The MP4 sits full-screen and fixed behind the content, giving the
+            page a staged, cinematic feel while the foreground scrolls.
+          </p>
+        </article>
+      </section>
+
+      <section class="panel panel-right">
+        <article class="glass-card">
+          <p class="eyebrow">Interaction model</p>
+          <h2>Scroll controls time</h2>
+          <p>
+            Page progress maps directly to video progress: top is the first
+            frame, middle is mid-video, and bottom lands at the final frame.
+          </p>
+        </article>
+      </section>
+
+      <section class="panel">
+        <article class="glass-card">
+          <p class="eyebrow">Prototype scope</p>
+          <h2>Video-based, not true 3D</h2>
+          <p>
+            This version uses video scrubbing only. It creates an interactive
+            impression without WebGL, depth buffers, lighting, or real camera
+            movement.
+          </p>
+        </article>
+      </section>
+
+      <section class="panel panel-right panel-end">
+        <article class="glass-card">
+          <p class="eyebrow">Production note</p>
+          <h2>Ready for a real asset</h2>
+          <p>
+            Upload the final MP4 with the expected filename and the same scroll
+            logic will drive the finished cinematic sequence.
+          </p>
+        </article>
+      </section>
+    </main>
+
+    <div id="videoNotice" class="video-notice" role="status">
+      Waiting for video asset: montfort-scroll-demo.mp4
+    </div>
+
+    <script src="./script.js?v=20260507-1345" defer></script>
+  </body>
+</html>

@@ -1,0 +1,234 @@
+:root {
+  --primary-blue: #5067eb;
+  --secondary-green: #d4fbcd;
+  --background-dark: #020617;
+  --text: #f8fafc;
+  --muted: rgba(248, 250, 252, 0.72);
+  --glass: rgba(2, 6, 23, 0.46);
+  --glass-border: rgba(255, 255, 255, 0.2);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-height: 100%;
+  background: var(--background-dark);
+  color: var(--text);
+  font-family: "Montserrat", Arial, Helvetica, sans-serif;
+}
+
+body {
+  min-height: 100%;
+  margin: 0;
+  overflow-x: hidden;
+  background: var(--background-dark);
+}
+
+.video-shell,
+.background-video,
+.fallback-frame,
+.shade {
+  position: fixed;
+  inset: 0;
+}
+
+.video-shell {
+  z-index: -2;
+  background:
+    radial-gradient(circle at 18% 18%, rgba(80, 103, 235, 0.42), transparent 34%),
+    linear-gradient(135deg, #020617 0%, #0f172a 48%, #07111f 100%);
+  overflow: hidden;
+}
+
+.background-video {
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 500ms ease;
+}
+
+.background-video.is-ready {
+  opacity: 1;
+}
+
+.fallback-frame {
+  z-index: 0;
+  background:
+    linear-gradient(120deg, rgba(80, 103, 235, 0.26), transparent 36%),
+    linear-gradient(245deg, rgba(212, 251, 205, 0.16), transparent 42%),
+    var(--background-dark);
+  opacity: 1;
+  transition: opacity 500ms ease;
+}
+
+.video-shell.is-ready .fallback-frame {
+  opacity: 0;
+}
+
+.shade {
+  z-index: 2;
+  background:
+    linear-gradient(90deg, rgba(2, 6, 23, 0.82), rgba(2, 6, 23, 0.48)),
+    linear-gradient(0deg, rgba(2, 6, 23, 0.54), rgba(2, 6, 23, 0.22));
+}
+
+.progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.progress span {
+  display: block;
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary-blue), var(--secondary-green));
+  box-shadow: 0 0 18px rgba(80, 103, 235, 0.8);
+}
+
+.story {
+  position: relative;
+  z-index: 1;
+}
+
+.panel {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding: clamp(24px, 6vw, 96px);
+}
+
+.panel-right {
+  justify-content: flex-end;
+}
+
+.panel-start {
+  align-items: flex-end;
+  padding-bottom: clamp(48px, 10vh, 120px);
+}
+
+.panel-end {
+  align-items: flex-start;
+  padding-top: clamp(72px, 14vh, 150px);
+}
+
+.glass-card {
+  width: min(100%, 560px);
+  padding: clamp(24px, 5vw, 44px);
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  background: var(--glass);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.42);
+  backdrop-filter: blur(22px) saturate(130%);
+}
+
+.eyebrow {
+  margin: 0 0 18px;
+  color: var(--secondary-green);
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+h1,
+h2 {
+  margin: 0;
+  max-width: 11ch;
+  line-height: 0.96;
+  letter-spacing: 0;
+}
+
+h1 {
+  font-size: clamp(3rem, 9vw, 7.5rem);
+}
+
+h2 {
+  font-size: clamp(2.35rem, 6vw, 5.4rem);
+}
+
+.glass-card p:last-child {
+  margin: 24px 0 0;
+  max-width: 38rem;
+  color: var(--muted);
+  font-size: clamp(1rem, 1.5vw, 1.18rem);
+  line-height: 1.7;
+}
+
+.video-notice {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 8;
+  max-width: min(360px, calc(100vw - 36px));
+  padding: 12px 14px;
+  border: 1px solid rgba(212, 251, 205, 0.32);
+  border-radius: 8px;
+  background: rgba(2, 6, 23, 0.78);
+  color: rgba(248, 250, 252, 0.84);
+  font-size: 0.82rem;
+  line-height: 1.45;
+  backdrop-filter: blur(14px);
+}
+
+.video-notice.is-hidden {
+  display: none;
+}
+
+.video-debug {
+  position: fixed;
+  left: 18px;
+  bottom: 18px;
+  z-index: 11;
+  display: none;
+  width: min(420px, calc(100vw - 36px));
+  max-height: min(360px, calc(100vh - 36px));
+  margin: 0;
+  padding: 12px 14px;
+  overflow: auto;
+  border: 1px solid rgba(80, 103, 235, 0.5);
+  border-radius: 8px;
+  background: rgba(2, 6, 23, 0.86);
+  color: rgba(248, 250, 252, 0.9);
+  font: 0.78rem/1.5 ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+  white-space: pre-wrap;
+  backdrop-filter: blur(14px);
+}
+
+.video-debug.is-visible {
+  display: block;
+}
+
+@media (max-width: 760px) {
+  .shade {
+    background:
+      linear-gradient(0deg, rgba(2, 6, 23, 0.78), rgba(2, 6, 23, 0.46)),
+      linear-gradient(90deg, rgba(2, 6, 23, 0.5), rgba(2, 6, 23, 0.46));
+  }
+
+  .panel,
+  .panel-right,
+  .panel-start,
+  .panel-end {
+    justify-content: center;
+    align-items: center;
+    padding: 24px;
+  }
+
+  .glass-card {
+    padding: 24px;
+  }
+
+  h1,
+  h2 {
+    max-width: 10ch;
+  }
+}
